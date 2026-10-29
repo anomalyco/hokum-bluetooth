@@ -1,0 +1,57 @@
+# The hokum-bluetooth .deb and .rpm, built by scripts/package-linux.sh with nfpm
+# from a release executable, in a directory it stages with blue,
+# hokum-bluetooth.desktop, and LICENSE. They install what the AUR package
+# hokum-bluetooth-bin does.
+name: hokum-bluetooth
+arch: ${HOKUM_PACKAGE_ARCH}
+platform: linux
+version: ${HOKUM_PACKAGE_VERSION}
+version_schema: none
+release: "1"
+section: admin
+priority: optional
+maintainer: Anomaly <hokum@anoma.ly>
+vendor: Anomaly
+homepage: https://github.com/anomalyco/hokum-bluetooth
+license: MIT
+description: |-
+  Hokum Bluetooth: a Bluetooth manager for Linux on BlueZ.
+  Power, pairing, connecting and battery levels, in one small window.
+contents:
+  - src: blue
+    dst: /usr/bin/blue
+    file_info:
+      mode: 0755
+  - src: hokum-bluetooth.desktop
+    dst: /usr/share/applications/hokum-bluetooth.desktop
+    file_info:
+      mode: 0644
+  - src: LICENSE
+    dst: /usr/share/licenses/hokum-bluetooth/LICENSE
+    file_info:
+      mode: 0644
+overrides:
+  # Linked: glibc and libgcc_s (BlueZ is reached over D-Bus by zbus, in
+  # Rust). Loaded at run time: the Vulkan loader, the Wayland client library
+  # and xkbcommon. BlueZ itself is what the app controls.
+  deb:
+    depends:
+      - libc6 (>= 2.39)
+      - libgcc-s1
+      - libxkbcommon0
+      - libvulkan1
+      - libwayland-client0
+    recommends:
+      - mesa-vulkan-drivers
+      - bluez
+  # Library names, so Fedora and openSUSE resolve them to their own packages.
+  rpm:
+    depends:
+      - libxkbcommon.so.0()(64bit)
+      - libvulkan.so.1()(64bit)
+      - libwayland-client.so.0()(64bit)
+    recommends:
+      - bluez
+rpm:
+  group: Applications/System
+  summary: Hokum Bluetooth device manager by Anomaly

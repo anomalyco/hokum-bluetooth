@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Hokum Bluetooth
+GenericName=Bluetooth Manager
+Comment=Pair and connect Bluetooth devices
+Exec=blue
+Icon=bluetooth
+Terminal=false
+StartupNotify=true
+Categories=Settings;HardwareSettings;
+Keywords=bluetooth;pair;connect;headphones;earbuds;mouse;keyboard;controller;battery;bluez;

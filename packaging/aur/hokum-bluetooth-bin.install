@@ -1,0 +1,3 @@
+post_install() {
+  echo 'Open Hokum Bluetooth from your launcher, or run: blue'
+}

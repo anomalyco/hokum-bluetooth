@@ -1,0 +1,41 @@
+# Maintainer: dax
+#
+# Generated from anomalyco/hokum-bluetooth packaging/aur by scripts/release-aur.sh,
+# which sets pkgver, the release service's linux-x64 and linux-arm64 file
+# URLs, and the checksums for each release.
+pkgname=hokum-bluetooth-bin
+pkgver=@VERSION@
+pkgrel=1
+pkgdesc='Hokum Bluetooth: a Bluetooth manager for Linux on BlueZ'
+arch=('x86_64' 'aarch64')
+url='https://github.com/anomalyco/hokum-bluetooth'
+license=('MIT')
+provides=('hokum-bluetooth')
+# The AUR has an unrelated package named blue that also installs /usr/bin/blue.
+conflicts=('hokum-bluetooth' 'blue')
+# Linked: glibc, libgcc (BlueZ is reached over D-Bus in Rust). Loaded at run
+# time (so namcap calls them unneeded): the Vulkan loader and a driver, the
+# Wayland client library and xkbcommon.
+depends=('glibc' 'libgcc' 'libxkbcommon' 'vulkan-driver' 'vulkan-icd-loader' 'wayland')
+optdepends=('bluez: the Bluetooth daemon this app controls'
+            'hokum-sound-bin: audio profiles and codecs for Bluetooth headphones')
+options=('!strip' '!debug')
+install=hokum-bluetooth-bin.install
+source=(
+  'hokum-bluetooth.desktop'
+  'LICENSE'
+)
+source_x86_64=("hokum-bluetooth-${pkgver}-linux-x64::@URL_X64@")
+source_aarch64=("hokum-bluetooth-${pkgver}-linux-arm64::@URL_ARM64@")
+sha256sums=('@DESKTOP_SHA256@'
+            '@LICENSE_SHA256@')
+sha256sums_x86_64=('@SHA256_X64@')
+sha256sums_aarch64=('@SHA256_ARM64@')
+
+package() {
+  local target=x64
+  [ "$CARCH" = aarch64 ] && target=arm64
+  install -Dm755 "hokum-bluetooth-${pkgver}-linux-${target}" "$pkgdir/usr/bin/blue"
+  install -Dm644 hokum-bluetooth.desktop "$pkgdir/usr/share/applications/hokum-bluetooth.desktop"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
