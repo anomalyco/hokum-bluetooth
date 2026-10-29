@@ -112,6 +112,9 @@ pub fn cli(argv: &[String]) -> i32 {
                 let s = wait(&rx, &bt, end.saturating_duration_since(Instant::now()) + Duration::from_millis(1), |_| Instant::now() >= end);
                 for d in s.nearby().filter(|d| d.rssi.is_some()) {
                     println!("{:>5} dBm  {:<17}  {:?}/{:?}  {}", d.rssi.unwrap_or(0), d.address, d.kind, d.bearer, d.display_name());
+                    if args.contains(&"-v") {
+                        println!("           {:?}", d.raw.properties);
+                    }
                 }
                 if let Some(i) = s.issues.first() {
                     println!("issue: {}", i.message);
