@@ -667,15 +667,19 @@ pub struct Driver {
 
 impl Driver {
     /// Replaces the snapshot (setting its `revision`) and notifies every listener.
-    pub fn publish(&self, mut state: State) {
+    pub fn publish(&self, state: State) {
+        Driver::publish_shared(&self.shared, state)
+    }
+
+    fn publish_shared(shared: &Shared, mut state: State) {
         let state = {
-            let mut current = self.shared.state.lock().unwrap_or_else(|e| e.into_inner());
+            let mut current = shared.state.lock().unwrap_or_else(|e| e.into_inner());
             state.revision = current.revision + 1;
             let state = Arc::new(state);
             *current = state.clone();
             state
         };
-        for (_, f) in self.shared.listeners.lock().unwrap_or_else(|e| e.into_inner()).iter() {
+        for (_, f) in shared.listeners.lock().unwrap_or_else(|e| e.into_inner()).iter() {
             f(&state);
         }
     }
@@ -688,6 +692,29 @@ impl Driver {
     /// Commands from the UI, in order. Disconnected once every [`Bluetooth`] is dropped.
     pub fn commands(&self) -> &Receiver<Command> {
         &self.commands
+    }
+
+    /// Splits into a [`Publisher`] (shareable across threads) and the command receiver, for a
+    /// backend that waits on commands on one thread and publishes from another.
+    pub fn split(self) -> (Publisher, Receiver<Command>) {
+        (Publisher { shared: self.shared }, self.commands)
+    }
+}
+
+/// The publishing half of a [`Driver`] (see [`Driver::split`]).
+#[derive(Clone)]
+pub struct Publisher {
+    shared: Arc<Shared>,
+}
+
+impl Publisher {
+    /// Same as [`Driver::publish`].
+    pub fn publish(&self, state: State) {
+        Driver::publish_shared(&self.shared, state)
+    }
+
+    pub fn current(&self) -> Arc<State> {
+        self.shared.state.lock().unwrap_or_else(|e| e.into_inner()).clone()
     }
 }
 
