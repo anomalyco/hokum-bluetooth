@@ -52,6 +52,7 @@ fn main() {
     match argv.first().map(String::as_str) {
         Some("check") => std::process::exit(if config::check() { 0 } else { 1 }),
         Some("update") => std::process::exit(update::cli(&argv)),
+        Some("debug") => std::process::exit(bluez::debug::cli(&argv)),
         Some("service") => {
             eprintln!("blue: the background service is not implemented yet");
             std::process::exit(1);

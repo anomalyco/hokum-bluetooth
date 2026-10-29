@@ -16,6 +16,7 @@ rune = { git = "https://github.com/anomalyco/rune.git", rev = "e5a6431ccbdbee844
 rune-kit = { git = "https://github.com/anomalyco/rune.git", rev = "e5a6431ccbdbee8442921a3e28e25185f2707f12" }
 rune-theme-opencode = { git = "https://github.com/anomalyco/rune.git", rev = "e5a6431ccbdbee8442921a3e28e25185f2707f12" }
 zbus = "5"
+async-channel = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 libc = "0.2"
