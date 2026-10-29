@@ -6,6 +6,7 @@ battery levels on BlueZ, in one small window. One of the Hokum tools.
 ```sh
 blue                  # open the window
 blue --mock           # the window on fake devices (no BlueZ)
+blue service          # stay running: a tray icon whose click opens a popover
 blue check            # problems in ~/.config/hokum-bluetooth/config.kdl
 blue update           # check for a new build
 ```

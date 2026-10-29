@@ -33,8 +33,10 @@ name, config in `~/.config/hokum-<tool>/`.
 - Almost no copy: no explanations, labels only where an icon can't say it.
 - At most about six controls on the first level.
 - Review every UI change from screenshots (`blue --snap <png> --scene <name>`,
-  on the mock backend; scenes `mock`, `scan`, `pairing`, `off`, `no-bluez`)
-  before calling it done.
+  on the mock backend) before calling it done. Scenes: `main` (= `mock`),
+  `expanded`, `scan`, `pairing`, `typing`, `pending`, `advanced`, `devices`,
+  `tray`, `off`, `no-bluez`. The window fits its content's height, but a snap
+  renders at `--size`: read the height from `--tree`'s `viewport` and pass it.
 
 ## Layout
 
@@ -45,8 +47,10 @@ name, config in `~/.config/hokum-<tool>/`.
   Device1, Battery1 and the pairing agent (Agent1) over zbus.
 - `src/mock.rs` — a fake adapter and devices with timed connects, discovery
   and pairing prompts; `--mock` and every headless scene.
-- `src/ui/` — the Rune window; keep the `mock` scene (the release smoke test
-  renders it).
+- `src/ui/` — the Rune window (`view.rs` levels one and two, `advanced.rs`
+  level three) and `tray.rs` (`blue service`: `rune::Tray` StatusNotifierItem
+  plus the popover, as Hokum Sound does it); keep the `mock` scene (the
+  release smoke test renders it).
 - `src/update.rs` — the release check-in (`hokum/<channel>/<version>/bluetooth`).
 - `src/config.rs` — `~/.config/hokum-bluetooth/config.kdl`.
 - Releases: docs/releasing.md. `.github/` needs Dax.
