@@ -4,7 +4,7 @@
 //! ```sh
 //! blue                        # open the window
 //! blue --mock                 # the window on a fake adapter and devices (no BlueZ)
-//! blue service                # stay running in the background (tray; later)
+//! blue service                # stay running in the background: a tray icon and its popover
 //! blue check                  # report problems in config.kdl
 //! blue update [--install]     # check for a new build now (and install it)
 //! blue --version
@@ -30,14 +30,16 @@ const HELP: &str = "usage: blue [service | check | update] [--mock] [--version] 
   blue                   open the window
     --mock               use a fake adapter and devices instead of BlueZ
                          (or HOKUM_BLUETOOTH_BACKEND=mock)
-  blue service           stay running in the background (tray; not yet)
+  blue service           stay running with a tray icon; a click opens a popover
+    --mock               on fake devices
   blue check             print problems in ~/.config/hokum-bluetooth/config.kdl;
                          exits non-zero if there are any
   blue update            check for a new build on this build's channel now
     --install            and install it, for a plain writable install
   --version              print the version
 Rune's tooling flags (--snap, --scene, --size, --theme, ...) render headless on the mock
-backend; scenes: mock, scan, pairing, off, no-bluez.";
+backend; scenes: main (mock), expanded, scan, pairing, typing, pending, advanced,
+devices, tray, off, no-bluez.";
 
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
@@ -53,22 +55,20 @@ fn main() {
         Some("check") => std::process::exit(if config::check() { 0 } else { 1 }),
         Some("update") => std::process::exit(update::cli(&argv)),
         Some("debug") => std::process::exit(bluez::debug::cli(&argv)),
-        Some("service") => {
-            eprintln!("blue: the background service is not implemented yet");
-            std::process::exit(1);
-        }
         _ => {}
     }
     let headless = argv.iter().any(|a| {
         matches!(a.as_str(), "--snap" | "--tree" | "--trace" | "--frames" | "--strip" | "--list-scenes" | "--first-pixels")
     });
     if headless {
-        rune::App::new(ui::spec()).run();
+        ui::headless();
         return;
     }
+    let service = argv.first().is_some_and(|a| a == "service");
     let mock = argv.iter().any(|a| a == "--mock") || std::env::var("HOKUM_BLUETOOTH_BACKEND").is_ok_and(|b| b == "mock");
     let source = if mock { model::Source::Mock } else { model::Source::Bluez };
     match model::start(source) {
+        Ok(bt) if service => ui::tray::service(bt),
         Ok(bt) => ui::run(bt),
         Err(e) => {
             eprintln!("blue: {e}");
